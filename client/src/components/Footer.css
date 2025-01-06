@@ -1,0 +1,12 @@
+/* Footer Styling */
+footer {
+    background-color: #242424;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    margin-top: auto; /* Push footer to the bottom of the page */
+}
+
+footer p {
+    margin: 0;
+}

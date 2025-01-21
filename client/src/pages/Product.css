@@ -43,6 +43,15 @@
     margin-bottom: 15px;
 }
 
+/* Styling for product images */
+.product-image {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 10px;
+  }
+  
+
 .product-card h3 {
     font-size: 1.5rem;
     margin-bottom: 10px;

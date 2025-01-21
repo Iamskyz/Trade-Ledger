@@ -1,29 +1,72 @@
-import './Product.css'; // Import the Product Page-specific styles
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "./Product.css";
 
 const Product = () => {
-    // Example product data (replace with API data later)
-    const products = [
-        { id: 1, name: 'Product 1', price: '$20', image: 'product1.jpg' },
-        { id: 2, name: 'Product 2', price: '$30', image: 'product2.jpg' },
-        { id: 3, name: 'Product 3', price: '$40', image: 'product3.jpg' },
-        { id: 4, name: 'Product 4', price: '$50', image: 'product4.jpg' },
-    ];
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-    return (
-        <div className="product-page">
-            <h1>Our Products</h1>
-            <div className="product-grid">
-                {products.map((product) => (
-                    <div key={product.id} className="product-card">
-                        <img src={product.image} alt={product.name} />
-                        <h3>{product.name}</h3>
-                        <p>{product.price}</p>
-                        <a href={`/product/${product.id}`} className="product-button">View Details</a>
-                    </div>
-                ))}
-            </div>
-        </div>
-    );
+  const fetchProducts = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/api/products");
+      if (!response.ok) {
+        throw new Error("Failed to fetch products");
+      }
+      const data = await response.json();
+      setProducts(data);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      setError("Failed to load products. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const handleBuyNow = (product) => {
+    navigate("/purchase", { state: { product } }); // Navigate to the Purchase Page with product data
+  };
+
+  return (
+    <div className="product-page">
+      <h1>Our Products</h1>
+
+      {loading && <p>Loading products...</p>}
+      {error && <p className="error-message">{error}</p>}
+
+      {!loading && !error && products.length === 0 && (
+        <p className="no-products-message">No products available.</p>
+      )}
+
+      <div className="product-grid">
+        {products.map((product) => (
+          <div key={product.id} className="product-item">
+            {product.image_url && (
+              <img
+                src={product.image_url}
+                alt={product.name}
+                className="product-image"
+              />
+            )}
+            <h2>{product.name}</h2>
+            <p>Price: ${product.price.toFixed(2)}</p>
+            <p>{product.description || "No description available."}</p>
+            <button
+              className="buy-now-button"
+              onClick={() => handleBuyNow(product)}
+            >
+              Buy Now
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 };
 
 export default Product;

@@ -1,30 +1,40 @@
-import './AdminSidebar.css';
-import { Link } from 'react-router-dom';
+import "./AdminSidebar.css";
+import { NavLink } from "react-router-dom";
 
 const AdminSidebar = () => {
-    return (
-        <aside className="admin-sidebar">
-            <nav>
-                <ul>
-                    <li>
-                        <Link to="/admin/dashboard">Overview</Link>
-                    </li>
-                    <li>
-                        <Link to="/admin/users">Users</Link>
-                    </li>
-                    <li>
-                        <Link to="/admin/products">Products</Link>
-                    </li>
-                    <li>
-                        <Link to="/admin/orders">Orders</Link>
-                    </li>
-                    <li>
-                        <Link to="/admin/profile">Profile</Link>
-                    </li>
-                </ul>
-            </nav>
-        </aside>
-    );
+  return (
+    <aside className="admin-sidebar">
+      <nav>
+        <ul>
+          <li>
+            <NavLink to="/admin/dashboard" activeClassName="active-link">
+              Overview
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/admin/users" activeClassName="active-link">
+              Manage Users
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/admin/products" activeClassName="active-link">
+              Manage Products
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/admin/orders" activeClassName="active-link">
+              Manage Orders
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/admin/profile" activeClassName="active-link">
+              Profile Settings
+            </NavLink>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+  );
 };
 
 export default AdminSidebar;

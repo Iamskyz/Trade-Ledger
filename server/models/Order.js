@@ -27,6 +27,10 @@ const Order = sequelize.define('Order', {
         type: DataTypes.INTEGER,
         allowNull: false
     },
+    address: {
+        type: DataTypes.TEXT, // Address field added
+        allowNull: false
+    },
     status: {
         type: DataTypes.ENUM('Pending', 'Completed', 'Canceled'),
         defaultValue: 'Pending'

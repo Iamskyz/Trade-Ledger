@@ -1,0 +1,29 @@
+/* Layout wrapper */
+.admin-layout {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+  
+  /* Body wrapper (Sidebar + Content) */
+  .admin-layout-body {
+    display: flex;
+    flex: 1;
+  }
+  
+  /* Sidebar styling */
+  .admin-layout .admin-sidebar {
+    flex: 0 0 250px;
+    background-color: #24292f;
+    color: #fff;
+    height: 100%;
+  }
+  
+  /* Main content area */
+  .admin-layout-content {
+    flex: 1;
+    padding: 20px;
+    background-color: #f8f9fa;
+    overflow-y: auto;
+  }
+  

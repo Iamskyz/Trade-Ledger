@@ -1,5 +1,5 @@
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useState } from "react";
 import "./Purchase.css";
 
 const Purchase = () => {
@@ -8,8 +8,23 @@ const Purchase = () => {
   const product = location.state?.product || null;
 
   const [quantity, setQuantity] = useState(1);
-  const [address, setAddress] = useState(""); // New state for address
+  const [address, setAddress] = useState("");
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    // Dynamically load Razorpay script
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    script.onload = () => console.log("Razorpay script loaded");
+    script.onerror = () => console.error("Failed to load Razorpay script");
+    document.body.appendChild(script);
+
+    // Cleanup script on component unmount
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
 
   if (!product) {
     return <p>Product not found. Please go back to the product page.</p>;
@@ -20,43 +35,86 @@ const Purchase = () => {
     setQuantity(value);
   };
 
-  const handlePlaceOrder = async () => {
-    console.log("Sending Order Data:", {
-      product_id: product.id,
-      quantity,
-      total_price: product.price * quantity,
-      address,
-    });
-    console.log(
-      "Sending Authorization Header:",
-      `Bearer ${localStorage.getItem("userToken")}`
-    );
-
+  const handlePayment = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/orders/place", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("userToken")}`,
-        },
-        body: JSON.stringify({
-          product_id: product.id,
-          quantity,
-          total_price: product.price * quantity,
-          address,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to place order");
-      }
+      // Call backend to create an order
+      const response = await fetch(
+        "http://localhost:5000/api/orders/razorpay-order",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+          },
+          body: JSON.stringify({
+            product_id: product.id,
+            quantity,
+            total_price: product.price * quantity,
+            address,
+          }),
+        }
+      );
 
       const data = await response.json();
-      alert(data.message);
-      navigate("/");
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to process payment.");
+      }
+
+      // Initialize Razorpay payment
+      const razorpayOptions = {
+        key: "rzp_test_ZOaKBf5pfPgbIQ", // Replace with your Razorpay key ID
+        amount: data.amount,
+        currency: data.currency,
+        name: "Shop Management System",
+        description: `Purchase of ${product.name}`,
+        order_id: data.id,
+        handler: async (paymentResponse) => {
+          try {
+            const verifyResponse = await fetch(
+              "http://localhost:5000/api/orders/verify-payment",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+                },
+                body: JSON.stringify({
+                  razorpay_order_id: paymentResponse.razorpay_order_id,
+                  razorpay_payment_id: paymentResponse.razorpay_payment_id,
+                  razorpay_signature: paymentResponse.razorpay_signature,
+                }),
+              }
+            );
+
+            const verifyData = await verifyResponse.json();
+            if (!verifyResponse.ok) {
+              throw new Error(
+                verifyData.message || "Payment verification failed."
+              );
+            }
+
+            alert("Payment successful!");
+            navigate("/");
+          } catch (err) {
+            console.error("Payment verification failed:", err);
+            setError("Payment verification failed. Please contact support.");
+          }
+        },
+        prefill: {
+          name: "Your Name",
+          email: "your-email@example.com",
+          contact: "9999999999",
+        },
+        theme: {
+          color: "#3399cc",
+        },
+      };
+
+      const razorpay = new window.Razorpay(razorpayOptions);
+      razorpay.open();
     } catch (err) {
-      console.error("Error placing order:", err);
-      setError("Failed to place order. Please try again.");
+      console.error("Error processing payment:", err);
+      setError("Failed to process payment. Please try again.");
     }
   };
 
@@ -97,8 +155,8 @@ const Purchase = () => {
           required
         ></textarea>
       </div>
-      <button className="place-order-button" onClick={handlePlaceOrder}>
-        Place Order
+      <button className="place-order-button" onClick={handlePayment}>
+        Pay Now
       </button>
     </div>
   );

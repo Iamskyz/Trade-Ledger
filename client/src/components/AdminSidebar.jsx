@@ -1,5 +1,5 @@
-import "./AdminSidebar.css";
 import { NavLink } from "react-router-dom";
+import "./AdminSidebar.css";
 
 const AdminSidebar = () => {
   return (
@@ -7,28 +7,35 @@ const AdminSidebar = () => {
       <nav>
         <ul>
           <li>
-            <NavLink to="/admin/dashboard" activeClassName="active-link">
-              Overview
+            <NavLink
+              to="/admin/dashboard"
+              className={({ isActive }) => (isActive ? "active-link" : "")}
+            >
+              Dashboard
             </NavLink>
           </li>
           <li>
-            <NavLink to="/admin/users" activeClassName="active-link">
-              Manage Users
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/admin/products" activeClassName="active-link">
+            <NavLink
+              to="/admin/products"
+              className={({ isActive }) => (isActive ? "active-link" : "")}
+            >
               Manage Products
             </NavLink>
           </li>
           <li>
-            <NavLink to="/admin/orders" activeClassName="active-link">
+            <NavLink
+              to="/admin/orders"
+              className={({ isActive }) => (isActive ? "active-link" : "")}
+            >
               Manage Orders
             </NavLink>
           </li>
           <li>
-            <NavLink to="/admin/profile" activeClassName="active-link">
-              Profile Settings
+            <NavLink
+              to="/admin/users"
+              className={({ isActive }) => (isActive ? "active-link" : "")}
+            >
+              Manage Users
             </NavLink>
           </li>
         </ul>

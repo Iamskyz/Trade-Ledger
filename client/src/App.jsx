@@ -13,10 +13,8 @@ import Product from "./pages/Product";
 import AboutUs from "./pages/AboutUs";
 import AdminLogin from "./pages/AdminLogin";
 import AdminSignup from "./pages/AdminSignup"; // Admin Signup page
-import AdminDashboard from "./pages/AdminDashboard"; // Admin Dashboard
-import AdminAddProduct from "./pages/AdminAddProduct"; // Add Product Page
-import AdminProducts from "./pages/AdminProducts"; // Admin Manage Products Page
 import Purchase from "./pages/Purchase"; // Purchase Page
+import AdminLayout from "./components/AdminLayout"; // AdminLayout Wrapper
 
 const App = () => {
   const isAdmin = localStorage.getItem("adminToken"); // Check if admin is logged in
@@ -38,22 +36,8 @@ const App = () => {
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin/signup" element={<AdminSignup />} />
           <Route
-            path="/admin/dashboard"
-            element={
-              isAdmin ? <AdminDashboard /> : <Navigate to="/admin/login" />
-            }
-          />
-          <Route
-            path="/admin/products"
-            element={
-              isAdmin ? <AdminProducts /> : <Navigate to="/admin/login" />
-            }
-          />
-          <Route
-            path="/admin/add-product"
-            element={
-              isAdmin ? <AdminAddProduct /> : <Navigate to="/admin/login" />
-            }
+            path="/admin/*"
+            element={isAdmin ? <AdminLayout /> : <Navigate to="/admin/login" />}
           />
           {/* Catch-all Route for Invalid Paths */}
           <Route path="*" element={<Navigate to="/" />} />

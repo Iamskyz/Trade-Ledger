@@ -1,5 +1,5 @@
-const { DataTypes } = require("sequelize"); // Import DataTypes
-const { sequelize } = require("../config/db"); // Import your Sequelize instance
+const { Sequelize, DataTypes } = require("sequelize");
+const { sequelize } = require("../config/db");
 
 const Product = sequelize.define(
   "Product",
@@ -27,12 +27,13 @@ const Product = sequelize.define(
     },
     image_url: {
       type: DataTypes.STRING,
-      allowNull: true, // This allows storing the image URL in the database
+      allowNull: true,
     },
   },
   {
-    timestamps: true, // Automatically include createdAt and updatedAt fields
+    timestamps: true,
   }
 );
 
+// No need to add belongsToMany here, as the association is already declared in Order.js
 module.exports = Product;

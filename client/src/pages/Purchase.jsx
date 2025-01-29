@@ -16,8 +16,8 @@ const Purchase = () => {
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
     script.async = true;
-    script.onload = () => console.log("Razorpay script loaded");
-    script.onerror = () => console.error("Failed to load Razorpay script");
+    script.onload = () => console.log("Razorpay script loaded successfully.");
+    script.onerror = () => console.error("Failed to load Razorpay script.");
     document.body.appendChild(script);
 
     // Cleanup script on component unmount
@@ -37,6 +37,7 @@ const Purchase = () => {
 
   const handlePayment = async () => {
     try {
+      console.log("Initiating Razorpay order creation...");
       // Call backend to create an order
       const response = await fetch(
         "http://localhost:5000/api/orders/razorpay-order",
@@ -56,6 +57,8 @@ const Purchase = () => {
       );
 
       const data = await response.json();
+      console.log("Razorpay order created:", data);
+
       if (!response.ok) {
         throw new Error(data.message || "Failed to process payment.");
       }
@@ -69,6 +72,7 @@ const Purchase = () => {
         description: `Purchase of ${product.name}`,
         order_id: data.id,
         handler: async (paymentResponse) => {
+          console.log("Razorpay payment response:", paymentResponse);
           try {
             const verifyResponse = await fetch(
               "http://localhost:5000/api/orders/verify-payment",
@@ -82,11 +86,17 @@ const Purchase = () => {
                   razorpay_order_id: paymentResponse.razorpay_order_id,
                   razorpay_payment_id: paymentResponse.razorpay_payment_id,
                   razorpay_signature: paymentResponse.razorpay_signature,
+                  product_id: product.id, // Pass product ID for verification
+                  quantity,
+                  total_price: product.price * quantity,
+                  address,
                 }),
               }
             );
 
             const verifyData = await verifyResponse.json();
+            console.log("Payment verification response:", verifyData);
+
             if (!verifyResponse.ok) {
               throw new Error(
                 verifyData.message || "Payment verification failed."

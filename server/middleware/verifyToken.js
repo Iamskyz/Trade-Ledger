@@ -1,19 +1,20 @@
 const jwt = require("jsonwebtoken");
 
 const verifyToken = (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1]; // Extract token
+  const token = req.headers.authorization?.split(" ")[1];
+  console.log("Received token:", token); // Debug log
+
   if (!token) {
-    console.log("Token missing");
-    return res.status(401).json({ message: "Unauthorized access" });
+    return res.status(401).json({ message: "Unauthorized access: Token missing" });
   }
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("Decoded token:", decoded);
-    req.user = decoded; // Attach decoded user info to the request
+    req.user = decoded;
+    console.log("Decoded token:", decoded); // Debug log
     next();
   } catch (error) {
-    console.log("Invalid token");
+    console.error("Invalid token:", error); // Debug log
     return res.status(403).json({ message: "Invalid token" });
   }
 };

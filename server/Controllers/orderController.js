@@ -16,7 +16,6 @@ const createRazorpayOrder = async (req, res) => {
   const currency = "INR";
 
   try {
-    // Create a new order in Razorpay
     const options = {
       amount,
       currency,
@@ -36,68 +35,61 @@ const createRazorpayOrder = async (req, res) => {
   }
 };
 
-// Place a New Order (Razorpay Verification)
-const placeOrder = async (req, res) => {
+// Verify Razorpay Payment
+const verifyRazorpayPayment = async (req, res) => {
   const {
+    razorpay_payment_id,
+    razorpay_order_id,
+    razorpay_signature,
     product_id,
     quantity,
     total_price,
     address,
-    razorpay_payment_id,
-    razorpay_order_id,
-    razorpay_signature,
   } = req.body;
-  const user_id = req.user?.id; // Extract user_id from the token
+  const user_id = req.user?.id;
 
-  console.log("Backend received data:", {
+  console.log("Verifying Razorpay payment with data:", {
+    razorpay_payment_id,
+    razorpay_order_id,
+    razorpay_signature,
     product_id,
     quantity,
     total_price,
     address,
-    razorpay_payment_id,
-    razorpay_order_id,
-    razorpay_signature,
     user_id,
   });
 
-  if (!user_id) {
-    console.log("User ID is missing");
-    return res.status(401).json({ message: "Unauthorized access" });
-  }
-
   try {
-    // Step 1: Verify Razorpay Signature
+    // Verify Razorpay signature
     const generatedSignature = crypto
       .createHmac("sha256", process.env.RAZORPAY_SECRET)
       .update(`${razorpay_order_id}|${razorpay_payment_id}`)
       .digest("hex");
+
+    console.log("Generated signature:", generatedSignature);
 
     if (generatedSignature !== razorpay_signature) {
       console.error("Invalid Razorpay signature");
       return res.status(400).json({ message: "Invalid payment signature" });
     }
 
-    // Step 2: Check if the product exists
+    // Check if the product exists
     const product = await Product.findByPk(product_id);
     if (!product) {
-      console.log("Product not found");
       return res.status(404).json({ message: "Product not found" });
     }
 
-    // Step 3: Check stock availability
+    // Check stock availability
     if (product.quantity < quantity) {
-      console.log("Insufficient stock for product:", product.name);
       return res.status(400).json({ message: "Insufficient stock for this product" });
     }
 
-    // Step 4: Deduct the stock
+    // Deduct stock
     product.quantity -= quantity;
     await product.save();
 
-    // Step 5: Create a unique order code
+    // Save order in the database
     const unique_order_code = `ORDER-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-
-    // Step 6: Save the order in the database
     const newOrder = await Order.create({
       user_id,
       product_id,
@@ -105,18 +97,18 @@ const placeOrder = async (req, res) => {
       total_price,
       address,
       unique_order_code,
-      status: "Completed", // Mark as completed since payment is successful
+      status: "Completed",
     });
 
     console.log("Order placed successfully:", newOrder);
 
     res.status(201).json({
-      message: "Order placed successfully",
+      message: "Payment verified and order placed successfully.",
       order: newOrder,
     });
   } catch (error) {
-    console.error("Error placing order:", error);
-    res.status(500).json({ message: "Failed to place order", error });
+    console.error("Error verifying payment:", error);
+    res.status(500).json({ message: "Payment verification failed.", error });
   }
 };
 
@@ -164,4 +156,9 @@ const getOrderStatus = async (req, res) => {
   }
 };
 
-module.exports = { placeOrder, updateOrderStatus, getOrderStatus, createRazorpayOrder };
+module.exports = {
+  updateOrderStatus,
+  getOrderStatus,
+  createRazorpayOrder,
+  verifyRazorpayPayment,
+};

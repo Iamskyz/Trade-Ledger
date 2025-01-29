@@ -1,13 +1,18 @@
 const express = require("express");
-const { createRazorpayOrder, placeOrder, updateOrderStatus, getOrderStatus } = require("../Controllers/orderController");
+const {
+  createRazorpayOrder,
+  verifyRazorpayPayment, // Make sure this is properly imported
+  updateOrderStatus,
+  getOrderStatus,
+} = require("../Controllers/orderController");
 const verifyToken = require("../middleware/verifyToken"); // Import middleware
 const router = express.Router();
 
 // Route to create a Razorpay order
 router.post("/razorpay-order", verifyToken, createRazorpayOrder);
 
-// Route to place a new order (with verifyToken middleware)
-router.post("/place", verifyToken, placeOrder);
+// Route to verify Razorpay payment
+router.post("/verify-payment", verifyToken, verifyRazorpayPayment);
 
 // Route to update the order status
 router.put("/update/:id", updateOrderStatus);

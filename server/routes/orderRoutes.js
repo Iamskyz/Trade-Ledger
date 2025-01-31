@@ -1,11 +1,14 @@
 const express = require("express");
 const {
   createRazorpayOrder,
-  verifyRazorpayPayment, // Make sure this is properly imported
+  verifyRazorpayPayment,
   updateOrderStatus,
   getOrderStatus,
+  getUserOrders,
+  getOrderInvoice,// ✅ Fetch user's orders
 } = require("../Controllers/orderController");
-const verifyToken = require("../middleware/verifyToken"); // Import middleware
+const verifyToken = require("../middleware/verifyToken");
+
 const router = express.Router();
 
 // Route to create a Razorpay order
@@ -19,5 +22,11 @@ router.put("/update/:id", updateOrderStatus);
 
 // Route to get the current order status
 router.get("/status/:id", getOrderStatus);
+
+// Route to fetch user orders
+router.get("/my-orders", verifyToken, getUserOrders);
+
+router.get("/invoice/:id", verifyToken, getOrderInvoice);
+
 
 module.exports = router;

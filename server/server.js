@@ -2,6 +2,15 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const { connectDB } = require("./config/db");
+const fs = require("fs");
+const path = require("path");
+
+// Ensure invoices folder exists
+const invoicesDir = path.join(__dirname, "invoices");
+if (!fs.existsSync(invoicesDir)) {
+  fs.mkdirSync(invoicesDir);
+}
+console.log("✅ Invoices folder checked and created if missing.");
 
 dotenv.config();
 

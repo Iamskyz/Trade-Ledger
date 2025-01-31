@@ -104,7 +104,7 @@ const Purchase = () => {
             }
 
             alert("Payment successful!");
-            navigate("/");
+            navigate("/my-orders");
           } catch (err) {
             console.error("Payment verification failed:", err);
             setError("Payment verification failed. Please contact support.");

@@ -14,6 +14,7 @@ import AboutUs from "./pages/AboutUs";
 import AdminLogin from "./pages/AdminLogin";
 import AdminSignup from "./pages/AdminSignup"; // Admin Signup page
 import Purchase from "./pages/Purchase"; // Purchase Page
+import MyOrders from "./pages/MyOrders"; // My Orders Page
 import AdminLayout from "./components/AdminLayout"; // AdminLayout Wrapper
 
 const App = () => {
@@ -32,6 +33,8 @@ const App = () => {
           <Route path="/about-us" element={<AboutUs />} />
           <Route path="/purchase" element={<Purchase />} />{" "}
           {/* Purchase Page */}
+          <Route path="/my-orders" element={<MyOrders />} />{" "}
+          {/* My Orders Page */}
           {/* Admin Routes */}
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin/signup" element={<AdminSignup />} />
